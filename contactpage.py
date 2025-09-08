@@ -47,6 +47,9 @@ def save_message(name, email, message, ip):
 # Email validation
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
+# Ad və soyad yoxlaması (böyük hərflə başlayan sözlər, yalnız hərflər və boşluq)
+NAME_RE = re.compile(r"^[A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+ [A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+(?: [A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+)*$")
+
 def validate_payload(data: dict):
     errors = {}
     name = (data.get("name") or "").strip()
@@ -54,8 +57,8 @@ def validate_payload(data: dict):
     message = (data.get("message") or "").strip()
     hp = (data.get("hp") or "").strip()  # honeypot field
     
-    if not (2 <= len(name) <= 100):
-        errors["name"] = "Ad 2–100 simvol olmalıdır."
+    if not NAME_RE.match(name):
+        errors["name"] = "Ad və soyad yalnız hərflərdən ibarət olmalı və düzgün formatda olmalıdır (məs: Aysun Rəsulova)."
     if not EMAIL_RE.match(email):
         errors["email"] = "Email düzgün formatda deyil."
     if not (10 <= len(message) <= 2000):
@@ -64,7 +67,7 @@ def validate_payload(data: dict):
         errors["hp"] = "Honeypot dolu gəlib (bot şübhəsi)."
     return errors
 
-#Rout-lar
+# Rout-lar
 @app.get("/contact")
 def contact_page():
     return render_template("contact.html", primary=PRIMARY) 
@@ -90,10 +93,21 @@ def api_contact():
         return jsonify({"error": "Çox tez-tez göndərirsiniz. 15 saniyə sonra yenidən cəhd edin."}), 429
     last_submit_by_ip[client_ip] = now
 
-    # DB-ye yaddasha ver
-    save_message(data["name"].strip(), data["email"].strip(), data["message"].strip(), str(client_ip))
+    # DB-ye yaddaşa ver
+    save_message(name=data["name"].strip(),
+                 email=data["email"].strip(),
+                 message=data["message"].strip(),
+                 ip=str(client_ip))
     return jsonify({"ok": True})
 
+@app.get("/admin/messages")
+def admin_messages():
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT id, name, email, message, created_at FROM contact_messages ORDER BY created_at DESC")
+    messages = cur.fetchall()
+    conn.close()
+    return render_template("admin_messages.html", messages=messages, primary=PRIMARY)
 
 if __name__ == "__main__":
     app.run(debug=True, host="localhost", port=5555)

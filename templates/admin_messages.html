@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<title>Admin Mesajlar</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<h1 style="color: {{ primary }}">Gələn mesajlar</h1>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Ad Soyad</th>
+            <th>Email</th>
+            <th>Mesaj</th>
+            <th>Vaxt</th>
+            <th>Cavab</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for msg in messages %}
+        <tr>
+            <td>{{ msg[0] }}</td>
+            <td>{{ msg[1] }}</td>
+            <td>{{ msg[2] }}</td>
+            <td>{{ msg[3] }}</td>
+            <td>{{ msg[4] }}</td>
+            <td>
+                <a href="mailto:{{ msg[2] }}?subject=Mesajınıza cavab&body=">Cavab ver</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>
