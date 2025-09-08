@@ -12,6 +12,7 @@ PRIMARY = "#2A314D"
 
 last_submit_by_ip = {}
 
+# DB daxil etme
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -29,6 +30,7 @@ def init_db():
     )
     conn.commit()
     conn.close()
+
 def save_message(name, email, message, ip):
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -42,40 +44,41 @@ def save_message(name, email, message, ip):
     conn.commit()
     conn.close()
 
-    EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+# Email validation
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
-    def validate_payload(data: dict):
-        errors = {}
-        name = (data.get("name") or "").strip()
-        email = (data.get("email") or "").strip()
-        message = (data.get("message") or "").strip()
-        hp = (data.get("hp") or "").strip()  
-        
-        if not (2 <= len(name) <= 100):
-            errors["name"] = "Ad 2–100 simvol olmalıdır."
-        if not EMAIL_RE.match(email):
-            errors["email"] = "Email düzgün formatda deyil."
-        if not (10 <= len(message) <= 2000):
-            errors["message"] = "Mesaj 10–2000 simvol aralığında olmalıdır."
-        if hp:
-            errors["hp"] = "Honeypot dolu gəlib (bot şübhəsi)."
-        return errors
+def validate_payload(data: dict):
+    errors = {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+    message = (data.get("message") or "").strip()
+    hp = (data.get("hp") or "").strip()  # honeypot field
+    
+    if not (2 <= len(name) <= 100):
+        errors["name"] = "Ad 2–100 simvol olmalıdır."
+    if not EMAIL_RE.match(email):
+        errors["email"] = "Email düzgün formatda deyil."
+    if not (10 <= len(message) <= 2000):
+        errors["message"] = "Mesaj 10–2000 simvol aralığında olmalıdır."
+    if hp:
+        errors["hp"] = "Honeypot dolu gəlib (bot şübhəsi)."
+    return errors
 
-    #Rout-lar
-    @app.get("/contact")
-    def contact_page():
-        return render_template("contact.html", primary=PRIMARY) 
+#Rout-lar
+@app.get("/contact")
+def contact_page():
+    return render_template("contact.html", primary=PRIMARY) 
 
-    @app.post("/api/contact")
-    def api_contact():
-        init_db()
-        data = request.get_json(force=True, silent=True) or {}
-        
-        errors = validate_payload(data)
-        if errors:
-            return jsonify({"error": "; ".join(f"{k}: {v}" for k, v in errors.items())}), 400
- 
-    #Vaxt derecesi 15 saniye)
+@app.post("/api/contact")
+def api_contact():
+    init_db()
+    data = request.get_json(force=True, silent=True) or {}
+    
+    errors = validate_payload(data)
+    if errors:
+        return jsonify({"error": "; ".join(f"{k}: {v}" for k, v in errors.items())}), 400
+
+    # Vaxt limiti (15 saniyə)
     try:
         client_ip = request.headers.get("X-Forwarded-For", request.remote_addr) or "0.0.0.0"
         client_ip = ip_address(client_ip.split(",")[0].strip())
@@ -87,9 +90,10 @@ def save_message(name, email, message, ip):
         return jsonify({"error": "Çox tez-tez göndərirsiniz. 15 saniyə sonra yenidən cəhd edin."}), 429
     last_submit_by_ip[client_ip] = now
 
-    #DB
-    save_message(data["name"].strip(), data["email"].strip(), data["message"].strip(), client_ip)
+    # DB-ye yaddasha ver
+    save_message(data["name"].strip(), data["email"].strip(), data["message"].strip(), str(client_ip))
     return jsonify({"ok": True})
 
-    if __name__ == "__main__":
-        app.run(debug=True, host='localhost', port=5555)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="localhost", port=5555)
