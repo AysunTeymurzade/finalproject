@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 import re
 from pathlib import Path
 from ipaddress import ip_address
+import smtplib
+from email.mime.text import MIMEText
 
 app = Flask(__name__)
 
@@ -12,7 +14,7 @@ PRIMARY = "#2A314D"
 
 last_submit_by_ip = {}
 
-# DB daxil etme
+# DB
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -44,10 +46,8 @@ def save_message(name, email, message, ip):
     conn.commit()
     conn.close()
 
-# Email validation
+# validasiya
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-
-# Ad və soyad yoxlaması (böyük hərflə başlayan sözlər, yalnız hərflər və boşluq)
 NAME_RE = re.compile(r"^[A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+ [A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+(?: [A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+)*$")
 
 def validate_payload(data: dict):
@@ -55,7 +55,7 @@ def validate_payload(data: dict):
     name = (data.get("name") or "").strip()
     email = (data.get("email") or "").strip()
     message = (data.get("message") or "").strip()
-    hp = (data.get("hp") or "").strip()  # honeypot field
+    hp = (data.get("hp") or "").strip()
     
     if not NAME_RE.match(name):
         errors["name"] = "Ad və soyad yalnız hərflərdən ibarət olmalı və düzgün formatda olmalıdır (məs: Aysun Rəsulova)."
@@ -67,7 +67,30 @@ def validate_payload(data: dict):
         errors["hp"] = "Honeypot dolu gəlib (bot şübhəsi)."
     return errors
 
-# Rout-lar
+# email
+SMTP_SERVER = "smtp.aesma.edu.az"   # AESMA SMTP server
+SMTP_PORT = 587
+EMAIL_USER = "info@aesma.edu.az"  # AESMA emaili
+EMAIL_PASS = "email_sifresi"             # email sifresi
+EMAIL_TO = "info@aesma.edu.az"   # mesajlarin gedeceyi AESMA emaili
+
+def send_email(name, email, message):
+    subject = f"Yeni mesaj: {name}"
+    body = f"Ad və Soyad: {name}\nEmail: {email}\nMesaj:\n{message}"
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = EMAIL_USER
+    msg["To"] = EMAIL_TO
+    
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(EMAIL_USER, EMAIL_PASS)
+            server.sendmail(EMAIL_USER, EMAIL_TO, msg.as_string())
+    except Exception as e:
+        print("Email göndərilərkən xəta:", e)
+
+# routlar
 @app.get("/contact")
 def contact_page():
     return render_template("contact.html", primary=PRIMARY) 
@@ -81,25 +104,32 @@ def api_contact():
     if errors:
         return jsonify({"error": "; ".join(f"{k}: {v}" for k, v in errors.items())}), 400
 
-    # Vaxt limiti (15 saniyə)
     try:
         client_ip = request.headers.get("X-Forwarded-For", request.remote_addr) or "0.0.0.0"
         client_ip = ip_address(client_ip.split(",")[0].strip())
     except Exception:
         client_ip = "0.0.0.0"
+
     now = datetime.utcnow()
     last = last_submit_by_ip.get(client_ip)
     if last and (now - last) < timedelta(seconds=15):
         return jsonify({"error": "Çox tez-tez göndərirsiniz. 15 saniyə sonra yenidən cəhd edin."}), 429
     last_submit_by_ip[client_ip] = now
 
-    # DB-ye yaddaşa ver
+    # DB-de saxlama
     save_message(name=data["name"].strip(),
                  email=data["email"].strip(),
                  message=data["message"].strip(),
                  ip=str(client_ip))
+    
+    # email gonderme
+    send_email(name=data["name"].strip(),
+               email=data["email"].strip(),
+               message=data["message"].strip())
+
     return jsonify({"ok": True})
 
+# admin paneli
 @app.get("/admin/messages")
 def admin_messages():
     conn = sqlite3.connect(DB_PATH)

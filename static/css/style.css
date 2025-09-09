@@ -1,5 +1,6 @@
 :root {
-  --primary: #2A314D;
+  --primary: #335AA2;
+  --primary-color-rgb: 51, 90, 162;
   --bg: #f5f6fa;
   --card: #fff;
   --border: #e5e7eb;
@@ -52,28 +53,61 @@ textarea { min-height:140px; resize: vertical; }
 .row { display: flex; gap:12px; flex-wrap:wrap; }
 .row .field { flex:1; }
 
-.btn {
-  width:100%; padding:14px;
-  border:none; border-radius:12px;
-  background: var(--primary); color:white;
-  font-weight:700; font-size:16px;
-  cursor:pointer; transition:0.2s;
+:root {
+  --primary-color: #335AA2;        
+  --primary-color-rgb: 51, 90, 162; 
 }
-.btn:hover { filter:brightness(1.05); }
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--primary-color); 
+  color: #fff; 
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: rgba(var(--primary-color-rgb), 0.85); /* hover zamanı tünd mavi */
+  transform: scale(1.05);
+}
+
 
 .alert { margin-top:12px; padding:12px; border-radius:12px; font-size:14px; line-height:1.4; }
 
 .socials {
-  display:flex; justify-content:center; gap:16px; margin-top:24px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
 }
-.socials a { font-size:24px; text-decoration:none; transition:none; }
-.socials a.facebook { color:#1877F2; }
-.socials a.instagram { color:#C13584; }
-.socials a.telegram { color:#0088cc; }
-.socials a.linkedin { color:#0A66C2; }
-.socials a.whatsapp { color:#25D366; }
+
+.socials a {
+  font-size: 24px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.socials a.facebook { color: #1877F2; }
+.socials a.instagram { color: #C13584; }
+.socials a.telegram { color: #0088cc; }
+.socials a.linkedin { color: #0A66C2; }
+.socials a.whatsapp { color: #25D366; }
+.socials a.x { color: #000000; }
+.socials a.youtube { color: #FF0000; }
+.socials a.email { color: #1E90FF; }
+.socials a.website { color: #2a52be; }
+
+.socials a:hover {
+  transform: scale(1.2);
+  opacity: 0.8; /* hover effekti */
+}
 
 .hp {
-  display: none; /* Bu sahəni tam gizlədir */
+  display: none; /* Sahe gizleme*/
 }
 
