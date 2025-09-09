@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bizimlə əlaqə saxlayın</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
@@ -39,22 +38,21 @@
         <input id="hp" name="hp" type="text" tabindex="-1" autocomplete="off">
       </div>
 
-
       <button id="submitBtn" class="btn" type="submit">Göndər</button>
       <div id="alert"></div>
     </form>
 
     <div class="socials">
+      <!-- Sosial linklər eyni qalır -->
       <a href="https://facebook.com/share/1AvLUT2pAK/" target="_blank" class="facebook"><i class="fab fa-facebook"></i></a>
       <a href="https://instagram.com/aesma.edu.az?igsh=MXBseDdyamVnaDNtNw==" target="_blank" class="instagram"><i class="fab fa-instagram"></i></a>
       <a href="https://t.me/aesma_edu_az" target="_blank" class="telegram"><i class="fab fa-telegram"></i></a>
-      <a href="https://www.linkedin.com/company/aesma-edu-az/" target="_blank" class="linkedin"><i class="fab fa-linkedin"></i></a>
+      <a href="https://www.linkedin.com/company/az%C9%99rbaycan-%C9%99m%C9%99k-v%C9%99-sosial-m%C3%BCnasiib%C9%99tl%C9%99r-akademiyas%C4%B1/" target="_blank" class="linkedin"><i class="fab fa-linkedin"></i></a>
       <a href="https://wa.me/+994102365097" target="_blank" class="whatsapp"><i class="fab fa-whatsapp"></i></a>
       <a href="https://x.com/aesma_edu_az" target="_blank" class="x"><i class="fab fa-x-twitter"></i></a>
       <a href="https://youtube.com/@aesmaofficial" target="_blank" class="youtube"><i class="fab fa-youtube"></i></a>
       <a href="mailto:info@aesma.edu.az" target="_blank" class="email"><i class="fas fa-envelope"></i></a>  
       <a href="https://aesma.edu.az/az" target="_blank" class="website"><i class="fas fa-globe"></i></a>
-
     </div>
 
     <div class="address" style="margin-top: 20px; display: flex; align-items: center; gap: 8px; justify-content: center;">
@@ -66,6 +64,39 @@
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+const form = document.getElementById('contact-form');
+const alertDiv = document.getElementById('alert');
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  alertDiv.innerText = "";
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const message = document.getElementById('message').value;
+  const hp = document.getElementById('hp').value;
+
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message, hp })
+    });
+    const data = await res.json();
+    if(res.ok){
+      alertDiv.style.color = "green";
+      alertDiv.innerText = "Mesaj uğurla göndərildi!";
+      form.reset();
+    } else {
+      alertDiv.style.color = "red";
+      alertDiv.innerText = data.error || "Xəta baş verdi.";
+    }
+  } catch(err) {
+    alertDiv.style.color = "red";
+    alertDiv.innerText = "Serverə qoşulmaq mümkün olmadı.";
+  }
+});
+</script>
+
 </body>
 </html>

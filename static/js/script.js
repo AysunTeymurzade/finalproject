@@ -1,40 +1,34 @@
-const form = document.getElementById('contact-form');
-const alertBox = document.getElementById('alert');
-const submitBtn = document.getElementById('submitBtn');
+const form = document.getElementById("contact-form");
+const alertDiv = document.getElementById("alert");
 
-function showAlert(type, message) {
-  alertBox.className = 'alert ' + (type === 'success' ? 'success' : 'error');
-  alertBox.textContent = message;
-}
-
-form.addEventListener('submit', async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const message = document.getElementById('message').value.trim();
-  const hp = document.getElementById('hp').value.trim();
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Göndərilir...';
+  const data = {
+    name: form.name.value,
+    email: form.email.value,
+    message: form.message.value,
+    hp: form.hp.value
+  };
 
   try {
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message, hp }),
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
     });
-    const data = await res.json();
+    const result = await res.json();
 
-    if (!res.ok) {
-      showAlert('error', data.error || 'Xəta baş verdi.');
-    } else {
-      showAlert('success', 'Mesaj qəbul olundu!');
+    if (res.ok) {
+      alertDiv.textContent = "Mesaj uğurla göndərildi!";
+      alertDiv.style.color = "green";
       form.reset();
+    } else {
+      alertDiv.textContent = result.error || "Xəta baş verdi";
+      alertDiv.style.color = "red";
     }
   } catch (err) {
-    showAlert('error', 'Şəbəkə xətası.');
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Göndər';
+    alertDiv.textContent = "Server xətası";
+    alertDiv.style.color = "red";
   }
 });
