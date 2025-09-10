@@ -13,7 +13,6 @@ PRIMARY = "#2A314D"
 JSON_PATH = Path("messages.json")
 last_submit_by_ip = {}
 
-# ---------------------------
 # JSON komekcileri
 def init_json():
     if not JSON_PATH.exists():
@@ -61,7 +60,7 @@ def validate_payload(data: dict):
         errors["hp"] = "Honeypot dolu gəlib (bot şübhəsi)."
     return errors
 
-# Email funksiyası
+# Email funksiyasi
 SMTP_SERVER = "smtp.aesma.edu.az"
 SMTP_PORT = 587
 EMAIL_USER = "info@aesma.edu.az"
@@ -108,7 +107,18 @@ def api_contact():
         return jsonify({"error": "Çox tez-tez göndərirsiniz. 15 saniyə sonra yenidən cəhd edin."}), 429
     last_submit_by_ip[client_ip] = now
 
-    # JSON yazmaq
+    # JSON yazma
+
+.btn:hover {
+  background-color: rgba(var(--primary-color-rgb), 0.85);
+  transform: scale(1.05);
+}
+
+#alert {
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+ q
     save_message_json(
         first_name=data["first_name"].strip(),
         last_name=data["last_name"].strip(),
@@ -135,4 +145,4 @@ def admin_messages():
     return render_template("admin_messages.html", messages=messages, primary=PRIMARY)
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=5555)
+    app.run(debug=True, host="localhost", port=5550)

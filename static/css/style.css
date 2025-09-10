@@ -82,16 +82,18 @@ textarea {
 
 .btn {
   width: 100%;
-  padding: 14px;
+  padding: 10px 14px;       /* əvvəl 14px, indi biraz incə */
   border: none;
   border-radius: 12px;
   background-color: var(--primary); 
   color: #fff; 
   font-weight: 700;
   font-size: 16px;
+  font-family: Cambria, Georgia, serif;  /* şrift dəyişdi */
   cursor: pointer;
   transition: 0.3s;
 }
+
 
 .btn:hover {
   background-color: rgba(var(--primary-color-rgb), 0.85);
