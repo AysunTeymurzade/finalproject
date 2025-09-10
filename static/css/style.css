@@ -8,9 +8,8 @@
   --label: #335AA2;
 }
 
-* { box-sizing: border-box; margin:0; padding:0; }
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: Cambria, Georgia, serif;
   background: linear-gradient(180deg, var(--bg), #eef0f6);
   color: var(--text);
 }
