@@ -5,7 +5,8 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const data = {
-    name: form.name.value,
+    first_name: form.first_name.value,
+    last_name: form.last_name.value,
     email: form.email.value,
     message: form.message.value,
     hp: form.hp.value

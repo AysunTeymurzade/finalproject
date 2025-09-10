@@ -53,17 +53,12 @@ textarea { min-height:140px; resize: vertical; }
 .row { display: flex; gap:12px; flex-wrap:wrap; }
 .row .field { flex:1; }
 
-:root {
-  --primary-color: #335AA2;        
-  --primary-color-rgb: 51, 90, 162; 
-}
-
 .btn {
   width: 100%;
   padding: 14px;
   border: none;
   border-radius: 12px;
-  background-color: var(--primary-color); 
+  background-color: var(--primary); 
   color: #fff; 
   font-weight: 700;
   font-size: 16px;
@@ -72,12 +67,18 @@ textarea { min-height:140px; resize: vertical; }
 }
 
 .btn:hover {
-  background-color: rgba(var(--primary-color-rgb), 0.85); /* hover zamanı tünd mavi */
+  background-color: rgba(var(--primary-color-rgb), 0.85);
   transform: scale(1.05);
 }
 
-
-.alert { margin-top:12px; padding:12px; border-radius:12px; font-size:14px; line-height:1.4; }
+#alert {
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+  font-size:14px;
+  line-height:1.4;
+  text-align:center;
+}
 
 .socials {
   display: flex;
@@ -104,19 +105,29 @@ textarea { min-height:140px; resize: vertical; }
 
 .socials a:hover {
   transform: scale(1.2);
-  opacity: 0.8; /* hover effekti */
+  opacity: 0.8;
+}
+
+.address {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.address a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.address i {
+  color:#007BFF;
 }
 
 .hp {
-  display: none; /* Sahe gizleme*/
+  display: none;
 }
-
-#alert {
-  margin-top:12px;
-  padding:12px;
-  border-radius:12px;
-  font-size:14px;
-  line-height:1.4;
-  text-align:center;
-}
-

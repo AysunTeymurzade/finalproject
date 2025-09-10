@@ -18,13 +18,18 @@
     <form id="contact-form" novalidate>
       <div class="row">
         <div class="field">
-          <label for="name">Ad və soyad</label>
-          <input id="name" name="name" type="text" placeholder="Adınız">
+          <label for="first_name">Ad</label>
+          <input id="first_name" name="first_name" type="text" placeholder="Adınız">
         </div>
         <div class="field">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" placeholder="email@misal.com">
+          <label for="last_name">Soyad</label>
+          <input id="last_name" name="last_name" type="text" placeholder="Soyadınız">
         </div>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="email@misal.com">
       </div>
 
       <div class="field">
@@ -33,7 +38,7 @@
       </div>
 
       <!-- Honeypot -->
-      <div class="hp" style="display:none;">
+      <div class="hp">
         <label for="hp">Sayt</label>
         <input id="hp" name="hp" type="text" tabindex="-1" autocomplete="off">
       </div>
@@ -43,7 +48,6 @@
     </form>
 
     <div class="socials">
-      <!-- Sosial linklər eyni qalır -->
       <a href="https://facebook.com/share/1AvLUT2pAK/" target="_blank" class="facebook"><i class="fab fa-facebook"></i></a>
       <a href="https://instagram.com/aesma.edu.az?igsh=MXBseDdyamVnaDNtNw==" target="_blank" class="instagram"><i class="fab fa-instagram"></i></a>
       <a href="https://t.me/aesma_edu_az" target="_blank" class="telegram"><i class="fab fa-telegram"></i></a>
@@ -55,48 +59,15 @@
       <a href="https://aesma.edu.az/az" target="_blank" class="website"><i class="fas fa-globe"></i></a>
     </div>
 
-    <div class="address" style="margin-top: 20px; display: flex; align-items: center; gap: 8px; justify-content: center;">
-        <a href="https://maps.app.goo.gl/nCHrphgofJz2UotSA" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 6px;">
-            <i class="fas fa-map-marker-alt" style="color:#007BFF;"></i>
+    <div class="address">
+        <a href="https://maps.app.goo.gl/nCHrphgofJz2UotSA" target="_blank">
+            <i class="fas fa-map-marker-alt"></i>
             Azadlıq prospekti 181, Bakı, Azərbaycan
         </a>
     </div>
   </div>
 </div>
 
-<script>
-const form = document.getElementById('contact-form');
-const alertDiv = document.getElementById('alert');
-
-form.addEventListener('submit', async e => {
-  e.preventDefault();
-  alertDiv.innerText = "";
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const message = document.getElementById('message').value;
-  const hp = document.getElementById('hp').value;
-
-  try {
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message, hp })
-    });
-    const data = await res.json();
-    if(res.ok){
-      alertDiv.style.color = "green";
-      alertDiv.innerText = "Mesaj uğurla göndərildi!";
-      form.reset();
-    } else {
-      alertDiv.style.color = "red";
-      alertDiv.innerText = data.error || "Xəta baş verdi.";
-    }
-  } catch(err) {
-    alertDiv.style.color = "red";
-    alertDiv.innerText = "Serverə qoşulmaq mümkün olmadı.";
-  }
-});
-</script>
-
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

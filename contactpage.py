@@ -20,12 +20,13 @@ def init_json():
         with open(JSON_PATH, "w", encoding="utf-8") as f:
             json.dump([], f, ensure_ascii=False, indent=2)
 
-def save_message_json(name, email, message, ip):
+def save_message_json(first_name, last_name, email, message, ip):
     init_json()
     with open(JSON_PATH, "r+", encoding="utf-8") as f:
         data = json.load(f)
         data.append({
-            "name": name,
+            "first_name": first_name,
+            "last_name": last_name,
             "email": email,
             "message": message,
             "ip": str(ip),
@@ -37,16 +38,21 @@ def save_message_json(name, email, message, ip):
 
 # Validatorlar
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-NAME_RE = re.compile(r"^[A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+ [A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+(?: [A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+)*$")
+FIRST_NAME_RE = re.compile(r"^[A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+$")
+LAST_NAME_RE = re.compile(r"^[A-ZƏİÖÜÇŞĞ][a-zəiöüçşğ]+$")
 
 def validate_payload(data: dict):
     errors = {}
-    name = (data.get("name") or "").strip()
+    first_name = (data.get("first_name") or "").strip()
+    last_name = (data.get("last_name") or "").strip()
     email = (data.get("email") or "").strip()
     message = (data.get("message") or "").strip()
     hp = (data.get("hp") or "").strip()
-    if not NAME_RE.match(name):
-        errors["name"] = "Ad və soyad yalnız hərflərdən ibarət olmalı və düzgün formatda olmalıdır (məs: Aysun Rəsulova)."
+
+    if not FIRST_NAME_RE.match(first_name):
+        errors["first_name"] = "Ad yalnız hərflərdən ibarət olmalı və böyük hərflə başlamalıdır."
+    if not LAST_NAME_RE.match(last_name):
+        errors["last_name"] = "Soyad yalnız hərflərdən ibarət olmalı və böyük hərflə başlamalıdır."
     if not EMAIL_RE.match(email):
         errors["email"] = "Email düzgün formatda deyil."
     if not (10 <= len(message) <= 2000):
@@ -62,9 +68,9 @@ EMAIL_USER = "info@aesma.edu.az"
 EMAIL_PASS = "email_sifresi"
 EMAIL_TO = "info@aesma.edu.az"
 
-def send_email(name, email, message):
-    subject = f"Yeni mesaj: {name}"
-    body = f"Ad və Soyad: {name}\nEmail: {email}\nMesaj:\n{message}"
+def send_email(first_name, last_name, email, message):
+    subject = f"Yeni mesaj: {first_name} {last_name}"
+    body = f"Ad: {first_name}\nSoyad: {last_name}\nEmail: {email}\nMesaj:\n{message}"
     msg = MIMEText(body)
     msg["Subject"] = subject
     msg["From"] = EMAIL_USER
@@ -104,7 +110,8 @@ def api_contact():
 
     # JSON yazmaq
     save_message_json(
-        name=data["name"].strip(),
+        first_name=data["first_name"].strip(),
+        last_name=data["last_name"].strip(),
         email=data["email"].strip(),
         message=data["message"].strip(),
         ip=client_ip
@@ -112,7 +119,8 @@ def api_contact():
 
     # Email gondermek
     send_email(
-        name=data["name"].strip(),
+        first_name=data["first_name"].strip(),
+        last_name=data["last_name"].strip(),
         email=data["email"].strip(),
         message=data["message"].strip()
     )
@@ -124,7 +132,6 @@ def admin_messages():
     init_json()
     with open(JSON_PATH, "r", encoding="utf-8") as f:
         messages = json.load(f)
-    # messages = [{"name": ..., "email": ..., "message": ..., "created_at": ...}, ...]
     return render_template("admin_messages.html", messages=messages, primary=PRIMARY)
 
 if __name__ == "__main__":
