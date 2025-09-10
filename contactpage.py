@@ -82,7 +82,7 @@ def send_email(first_name, last_name, email, message):
     except Exception as e:
         print("Email göndərilərkən xəta:", e)
 
-# Rout-lar
+# Routlar
 @app.get("/contact")
 def contact_page():
     return render_template("contact.html", primary=PRIMARY)
@@ -94,7 +94,7 @@ def api_contact():
     if errors:
         return jsonify({"error": "; ".join(f"{k}: {v}" for k, v in errors.items())}), 400
 
-    # Rate limit
+    # Rate limiti
     try:
         client_ip = request.headers.get("X-Forwarded-For", request.remote_addr) or "0.0.0.0"
         client_ip = ip_address(client_ip.split(",")[0].strip())
@@ -107,18 +107,7 @@ def api_contact():
         return jsonify({"error": "Çox tez-tez göndərirsiniz. 15 saniyə sonra yenidən cəhd edin."}), 429
     last_submit_by_ip[client_ip] = now
 
-    # JSON yazma
-
-.btn:hover {
-  background-color: rgba(var(--primary-color-rgb), 0.85);
-  transform: scale(1.05);
-}
-
-#alert {
-  margin-top:12px;
-  padding:12px;
-  border-radius:12px;
- q
+    # JSON
     save_message_json(
         first_name=data["first_name"].strip(),
         last_name=data["last_name"].strip(),
